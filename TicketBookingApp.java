@@ -183,7 +183,7 @@ public class TicketBookingApp {
                     scanner.close();
                     return;
                 default:
-                    System.out.println("Pilihan tidak valid!");
+                    System.out.println("Pilihan tidak valid!");            //
             }
         }
     }
