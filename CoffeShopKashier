@@ -1,0 +1,156 @@
+import java.awt.*;
+import java.text.DecimalFormat;
+import javax.swing.*;
+
+public class CoffeeShopCashier {
+
+    private JFrame frame;
+    private JTextArea orderArea;
+    private JLabel totalLabel;
+    private double totalPrice;
+    private JTextArea receiptArea;
+    private DecimalFormat priceFormat;
+
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                CoffeeShopCashier window = new CoffeeShopCashier();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public CoffeeShopCashier() {
+        totalPrice = 0.0;
+        priceFormat = new DecimalFormat("#,###.00");
+        initialize();
+    }
+
+    private void initialize() {
+        frame = new JFrame("Kasir Coffee Shop");
+        frame.setBounds(100, 100, 700, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new BorderLayout());
+
+        createDrinkPanel();
+        createOrderPanel();
+        createTotalPanel();
+        createReceiptPanel();
+        createCustomerInfoPanel(); 
+    }
+
+    private void createDrinkPanel() {
+        JPanel drinkPanel = new JPanel();
+        frame.getContentPane().add(drinkPanel, BorderLayout.NORTH);
+
+        addDrinkButton(drinkPanel, "Americano", 18000);
+        addDrinkButton(drinkPanel, "Cappuccino", 22000);
+        addDrinkButton(drinkPanel, "Espresso", 15000);
+        addDrinkButton(drinkPanel, "Macchiato", 20000);
+        addDrinkButton(drinkPanel, "Mocha", 23000);
+        addDrinkButton(drinkPanel, "Iced Coffee", 20000);
+        addDrinkButton(drinkPanel, "Iced Tea", 18000);
+        addDrinkButton(drinkPanel, "Hot Chocolate", 25000);
+        addDrinkButton(drinkPanel, "Black Tea", 17000);
+        addDrinkButton(drinkPanel, "Green Tea", 19000);
+    }
+
+    private void addDrinkButton(JPanel panel, String name, double price) {
+        JButton button = new JButton(name + " - Rp " + priceFormat.format(price));
+        button.addActionListener(e -> addOrder(name, price)); // Pastikan ini ada
+        panel.add(button);
+    }
+
+    private void createOrderPanel() {
+        JPanel orderPanel = new JPanel();
+        orderPanel.setLayout(new BorderLayout());
+        frame.getContentPane().add(orderPanel, BorderLayout.CENTER);
+
+        orderArea = new JTextArea();
+        orderArea.setEditable(false);
+        orderPanel.add(new JScrollPane(orderArea), BorderLayout.CENTER);
+    }
+
+    private void createTotalPanel() {
+        JPanel totalPanel = new JPanel();
+        frame.getContentPane().add(totalPanel, BorderLayout.SOUTH);
+
+        totalLabel = new JLabel("Total: Rp 0");
+        totalPanel.add(totalLabel);
+
+        JButton btnCheckout = new JButton("Checkout");
+        btnCheckout.addActionListener(e -> {
+            if (totalPrice == 0) {
+                JOptionPane.showMessageDialog(frame, "Tidak ada pesanan untuk checkout!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                generateReceipt();
+            }
+        });
+        totalPanel.add(btnCheckout);
+
+        JButton btnReset = new JButton("Reset");
+        btnReset.addActionListener(e -> resetOrder());
+        totalPanel.add(btnReset);
+    }
+
+    private void createReceiptPanel() {
+        JPanel receiptPanel = new JPanel();
+        frame.getContentPane().add(receiptPanel, BorderLayout.EAST);
+        receiptPanel.setLayout(new BorderLayout());
+
+        receiptArea = new JTextArea();
+        receiptArea.setEditable(false);
+        receiptPanel.add(new JScrollPane(receiptArea), BorderLayout.CENTER);
+    }
+
+    private void createCustomerInfoPanel() {
+        JPanel customerInfoPanel = new JPanel();
+        customerInfoPanel.setLayout(new FlowLayout());
+        frame.getContentPane().add(customerInfoPanel, BorderLayout.WEST);
+
+        JLabel nameLabel = new JLabel("Nama Pelanggan:");
+        customerInfoPanel.add(nameLabel);
+
+        JTextField nameField = new JTextField(15);
+        customerInfoPanel.add(nameField);
+
+        JButton saveButton = new JButton("Simpan");
+        saveButton.addActionListener(e -> {
+            String customerName = nameField.getText().trim();
+            if (customerName.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Nama pelanggan tidak boleh kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Nama pelanggan disimpan: " + customerName, "Informasi", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        customerInfoPanel.add(saveButton);
+    }
+
+    private void addOrder(String itemName, double price) {
+        orderArea.append(itemName + " - Rp " + priceFormat.format(price) + "\n");
+        totalPrice += price;
+        totalLabel.setText("Total: Rp " + priceFormat.format(totalPrice));
+        System.out.println("Total Price: " + totalPrice); 
+    }
+
+    private void resetOrder() {
+        orderArea.setText("");
+        totalPrice = 0.0;
+        totalLabel.setText("Total: Rp 0");
+        receiptArea.setText("");
+    }
+
+    private void generateReceipt() {
+        StringBuilder receipt = new StringBuilder();
+        receipt.append("------ Nota Pembelian ------\n");
+        receipt.append("Daftar Pesanan:\n");
+        receipt.append(orderArea.getText());
+        receipt.append("\nTotal: Rp " + priceFormat.format(totalPrice) + "\n");
+        receipt.append("---------------------------\n");
+        receipt.append("Terima Kasih telah berbelanja di Coffee Shop!\n");
+
+        receiptArea.setText(receipt.toString());
+    }
+}
